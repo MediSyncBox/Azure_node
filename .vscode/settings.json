@@ -1,0 +1,4 @@
+{
+    "appService.defaultWebAppToDeploy": "/subscriptions/d5157bd9-2149-4442-b565-45ce7ba5cfc1/resourceGroups/appsvc_linux_centralus/providers/Microsoft.Web/sites/MediSyncConnection1",
+    "appService.deploySubpath": "."
+}
