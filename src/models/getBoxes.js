@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const sql = require('mssql');
-const dbConfig = require('../dbConfig'); // 确保这个路径与你的文件结构匹配
+const dbConfig = require('../dbConfig'); 
 
 // Database operation for getting boxes
 async function getBoxes() {
