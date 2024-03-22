@@ -65,6 +65,24 @@ async function loginUser(req, res) {
     }
 }
 
+
+async function getUserInfo(req, res) {
+    try {
+        const decoded = jwt.verify(req.headers.authorization.split(' ')[1], 'your_secret_key');
+        let pool = await sql.connect(dbConfig);
+        let result = await pool.request()
+            .input('id', sql.Int, decoded.id)
+            .query('SELECT * FROM [dbo].[users] WHERE id = @id;');
+        res.json(result.recordset[0]);
+    } catch (err) {
+        console.error('Failed to get user info:', err.message);
+        res.status(500).send(err.message);
+    }
+}
+
+router.get('/userinfo', getUserInfo);
+
+
 router.post('/login', loginUser);
 
 router.post('/register', registerUser);
