@@ -1,7 +1,9 @@
 const express = require('express');
-const router = express.Router();
+const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
 const sql = require('mssql');
 const dbConfig = require('../dbConfig'); 
+const router = express.Router();
 
 async function registerUser(req, res) {
     let { emailorPhone, userName, password } = req.body;
