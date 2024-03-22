@@ -3,6 +3,7 @@ const app = express();
 const boxRoutes = require('./src/models/getBoxes'); 
 const userRoutes = require('./src/models/loginRegister'); 
 
+app.use(express.json());
 app.get('/api/test', (req, res) => {
   res.send('Test route is working!');
 });
