@@ -11,12 +11,12 @@ async function addBox(req, res) {
       let pool = await sql.connect(dbConfig);
       
       // 检查Box是否存在
-      const box = await pool.request()
+      const boxExists = await pool.request()
         .input('boxId', sql.Int, boxId)
         .query('SELECT * FROM dbo.box WHERE id = @boxId;');
       
-      if (box.recordset.length === 0) {
-        return res.status(404).send('Box not found.');
+      if (boxExists.recordset.length === 0) {
+        return res.status(404).json({ message: 'Box not found.' });
       }
       
       // 更新Box信息
@@ -26,12 +26,19 @@ async function addBox(req, res) {
         .input('boxId', sql.Int, boxId)
         .query('UPDATE dbo.box SET user_id = @userId, name = @name WHERE id = @boxId;');
       
-      res.status(200).json({ message: 'Box updated successfully.' });
+      // 重新查询这个Box来获取更新后的全部信息
+      const updatedBox = await pool.request()
+        .input('boxId', sql.Int, boxId)
+        .query('SELECT * FROM dbo.box WHERE id = @boxId;');
+      
+      // 将更新后的信息发送给前端
+      res.json(updatedBox.recordset[0]); // 发送第一条记录作为JSON响应
     } catch (err) {
       console.error('Failed to update box:', err.message);
-      res.status(500).send(err.message);
+      res.status(500).json({ message: err.message });
     }
   }
+  
   
 
 router.post('/addBox', addBox);
