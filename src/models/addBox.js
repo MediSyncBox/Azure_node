@@ -26,7 +26,7 @@ async function addBox(req, res) {
         .input('boxId', sql.Int, boxId)
         .query('UPDATE dbo.box SET user_id = @userId, name = @name WHERE id = @boxId;');
       
-      res.status(200).send('Box updated successfully.');
+      res.status(200).json({ message: 'Box updated successfully.' });
     } catch (err) {
       console.error('Failed to update box:', err.message);
       res.status(500).send(err.message);
