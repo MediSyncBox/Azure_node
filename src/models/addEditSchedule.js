@@ -5,45 +5,30 @@ const router = express.Router();
 
 // Function to add or update a schedule
 async function addEditSchedule(req, res) {
-    const { userId, medicine, dose, time, taken } = req.body;
+    // Destructure the body to get the schedule details
+    let { userId, medicine, dose, time, taken } = req.body;
 
     try {
+        // Connect to the database
         let pool = await sql.connect(dbConfig);
-        await pool.request()
-                .input('UserId', sql.Int, userId)
-                .input('Medicine', sql.NVarChar, medicine)
-                .input('Dose', sql.Int, dose)
-                .input('Time', sql.SmallDateTime, new Date(time))
-                .input('Taken', sql.Bit, taken)
-                .query('INSERT INTO dbo.schedule (user_id, medicine, dose, time, taken) VALUES (@UserId, @Medicine, @Dose, @Time, @Taken);');
-        
 
-        // if (id) {
-        //     // If an ID is provided, we update the existing record.
-        //     await pool.request()
-        //         .input('Id', sql.Int, id)
-        //         .input('UserId', sql.Int, userId)
-        //         .input('Medicine', sql.NVarChar, medicine)
-        //         .input('Dose', sql.Int, dose)
-        //         .input('Time', sql.SmallDateTime, new Date(time))
-        //         .input('Taken', sql.Bit, taken)
-        //         .query('UPDATE dbo.schedule SET medicine = @Medicine, dose = @Dose, time = @Time, taken = @Taken WHERE id = @Id;');
-        // } else {
-        //     // If no ID is provided, we insert a new record.
-        //     await pool.request()
-        //         .input('UserId', sql.Int, userId)
-        //         .input('Medicine', sql.NVarChar, medicine)
-        //         .input('Dose', sql.Int, dose)
-        //         .input('Time', sql.SmallDateTime, new Date(time))
-        //         .input('Taken', sql.Bit, taken)
-        //         .query('INSERT INTO dbo.schedule (user_id, medicine, dose, time, taken) VALUES (@UserId, @Medicine, @Dose, @Time, @Taken);');
-        // }
+        // Perform the INSERT operation
+        let result = await pool.request()
+            .input('userId', sql.Int, userId)
+            .input('medicine', sql.NVarChar, medicine)
+            // Only include dose and time in the query if they are provided
+            .input('dose', sql.Int, dose)
+            .input('time', sql.SmallDateTime, time)
+            // Convert taken to a boolean if it's provided; otherwise, insert null
+            .input('taken', sql.Bit, taken)
+            .query('INSERT INTO [dbo].[schedule] (user_id, medicine, dose, time, taken) VALUES (@userId, @medicine, @dose, @time, @taken);');
 
-        res.json({ message: 'Schedule successfully processed.' });
-
+        // Respond with success if the INSERT operation is successful
+        res.status(201).send('Schedule added successfully.');
     } catch (err) {
-        console.error('Failed to process schedule:', err.message);
-        res.status(500).json({ message: err.message });
+        // Log and respond with the error message if there's an error
+        console.error('Failed to add schedule:', err.message);
+        res.status(500).send(err.message);
     }
 }
 
