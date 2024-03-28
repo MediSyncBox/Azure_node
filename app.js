@@ -3,6 +3,7 @@ const app = express();
 const boxRoutes = require('./src/models/getBoxes'); 
 const userRoutes = require('./src/models/loginRegister'); 
 const addBoxRoutes = require('./src/models/addBox'); 
+const addScheduleRoutes = require('./src/models/addEditSchedule'); 
 
 
 app.use(express.json());
@@ -13,6 +14,8 @@ app.get('/api/test', (req, res) => {
 app.use('/api', boxRoutes);
 app.use('/api', userRoutes);
 app.use('/api', addBoxRoutes);
+app.use('/api', addScheduleRoutes);
+
 
 const port = process.env.PORT || 3000;
 app.listen(port, () => {
