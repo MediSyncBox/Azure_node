@@ -4,7 +4,7 @@ const dbConfig = require('../dbConfig');
 const router = express.Router();
 
 // Function to add or update a schedule
-async function addOrUpdateSchedule(req, res) {
+async function addEditSchedule(req, res) {
     const { id, userId, medicine, dose, time, taken } = req.body;
 
     try {
@@ -39,6 +39,6 @@ async function addOrUpdateSchedule(req, res) {
     }
 }
 
-router.post('/schedule', addOrUpdateSchedule);
+router.post('/addEditSchedule', addEditSchedule);
 
 module.exports = router;
