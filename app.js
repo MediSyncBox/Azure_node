@@ -10,6 +10,7 @@ const getSchedulesRoutes = require('./src/models/getSchedules');
 const updateSchedulesRoutes = require('./src/models/updateSchedules');
 const updateTakenStatusRoutes = require('./src/models/updateTakenStatus');
 const getPatientRoutes = require('./src/models/getPatient');
+const addPatientRoutes = require('./src/models/addPatient');
 
 app.use(express.json());
 app.get('/api/test', (req, res) => {
@@ -26,6 +27,7 @@ app.use('/api', getUserBoxRoutes);
 app.use('/api', updateSchedulesRoutes);
 app.use('/api', updateTakenStatusRoutes);
 app.use('/api', getPatientRoutes);
+app.use('/api', addPatientRoutes);
 
 
 const port = process.env.PORT || 3000;
