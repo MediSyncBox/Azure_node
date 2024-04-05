@@ -4,7 +4,7 @@ const dbConfig = require('../dbConfig');
 const router = express.Router();
 
 // Function to get user names associated with a caregiver ID
-async function getPatients(req, res) {
+async function getPatient(req, res) {
     const { caregiverId } = req.params; // Get the caregiver_id from request parameters
 
     try {
@@ -27,6 +27,6 @@ async function getPatients(req, res) {
 }
 
 // Route to get user names for a caregiver
-router.get('/getPatient/:caregiverId', getPatients);
+router.get('/getPatient/:caregiverId', getPatient);
 
 module.exports = router;
