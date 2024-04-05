@@ -3,6 +3,7 @@ const app = express();
 const boxRoutes = require('./src/models/getBoxes'); 
 const userRoutes = require('./src/models/loginRegister'); 
 const addBoxRoutes = require('./src/models/addBox'); 
+const getUserBoxRoutes = require('./src/models/loginRegister'); 
 const getTankInfoRoutes = require('./src/models/getTankInfo'); 
 const addScheduleRoutes = require('./src/models/addEditSchedule'); 
 const getSchedulesRoutes = require('./src/models/getSchedules');
@@ -20,6 +21,7 @@ app.use('/api', addBoxRoutes);
 app.use('/api', getTankInfoRoutes);
 app.use('/api', addScheduleRoutes);
 app.use('/api', getSchedulesRoutes);
+app.use('/api', getUserBoxRoutes);
 app.use('/api', updateSchedulesRoutes);
 app.use('/api', updateTakenStatusRoutes);
 
