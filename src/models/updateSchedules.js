@@ -16,7 +16,7 @@ async function updateSchedule(req, res) {
             .input('dose', sql.Int, dose)
             .input('time', sql.SmallDateTime, time)
             .input('taken', sql.Bit, taken)
-            .query('UPDATE [dbo].[schedule] SET medicine = @medicine, dose = @dose, time = @time, taken = @taken WHERE id = @id;');
+            .query('UPDATE [dbo].[schedule] SET medicine = @medicine, dose = @dose, time = @time, taken = @taken, last_updated = GETDATE() WHERE id = @id;');
 
         res.status(200).json({ success: true, message: 'Schedule updated successfully.' });
     } catch (err) {
