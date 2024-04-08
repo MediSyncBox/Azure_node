@@ -4,8 +4,7 @@ const dbConfig = require('../dbConfig');
 const router = express.Router();
 
 async function addBox(req, res) {
-    const { userId, boxId, name } = req.body;
-
+    const { userId, boxId, name, isUserOwnBox } = req.body;
     try {
         let pool = await sql.connect(dbConfig);
 
@@ -23,8 +22,8 @@ async function addBox(req, res) {
             .input('userId', sql.Int, userId)
             .input('boxId', sql.Int, boxId)
             .input('name', sql.NVarChar, name)
-            // Ensure the column names match your database schema
-            .query('INSERT INTO dbo.user_box (user_id, box_id, name) VALUES (@userId, @boxId, @name);');
+            .input('isUserOwnBox', sql.Bit, isUserOwnBox)
+            .query('INSERT INTO dbo.user_box (user_id, box_id, name, IsUserOwnBox) VALUES (@userId, @boxId, @name, @isUserOwnBox);');
 
         res.json({ message: 'Box successfully added to user with name.' });
 
