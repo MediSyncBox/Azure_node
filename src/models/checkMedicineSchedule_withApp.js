@@ -1,8 +1,9 @@
+import { app, timer } from "@azure/functions";
 const sql = require('mssql');
 const dbConfig = require('./dbConfig');
 const http = require('http');
 
-async function checkMedicineSchedule() {
+async function checkMedicineSchedule(context) {
   const currentTime = new Date().toLocaleTimeString();
 
   try {
@@ -11,7 +12,7 @@ async function checkMedicineSchedule() {
     // Query the schedule table to check for matching scheduled times
     const scheduleResult = await pool.request()
       .input('currentTime', sql.VarChar, currentTime)
-      .query('SELECT * FROM dbo.schedule WHERE time = @currentTime and taken = 0');
+      .query('SELECT * FROM dbo.schedule WHERE time = @currentTime AND taken = 0');
 
     if (scheduleResult.recordset.length > 0) {
       // Matching schedules found
@@ -49,11 +50,11 @@ async function checkMedicineSchedule() {
 
             // Send the message to the HTTPS URL
             const req = http.request(options, (res) => {
-              console.log(`Medicine reminder sent for Box ID: ${boxId}, Tank ID: ${tankId}`);
+              context.log(`Medicine reminder sent for Box ID: ${boxId}, Tank ID: ${tankId}`);
             });
 
             req.on('error', (error) => {
-              console.error(`Error sending medicine reminder for Box ID: ${boxId}, Tank ID: ${tankId}`, error);
+              context.log(`Error sending medicine reminder for Box ID: ${boxId}, Tank ID: ${tankId}`, error);
             });
 
             req.write(JSON.stringify({
@@ -65,19 +66,23 @@ async function checkMedicineSchedule() {
 
             req.end();
           } else {
-            console.log(`No tank found for medicine: ${medicineName} and Box ID: ${boxId}`);
+            context.log(`No tank found for medicine: ${medicineName} and Box ID: ${boxId}`);
           }
         } else {
-          console.log(`No box found for User ID: ${userId}`);
+          context.log(`No box found for User ID: ${userId}`);
         }
       }
     } else {
-      console.log('No matching medicine schedules found');
+      context.log('No matching medicine schedules found');
     }
   } catch (err) {
-    console.log('SQL error:', err);
+    context.log('SQL error:', err);
   }
 }
 
-// Run the checkMedicineSchedule function every minute
-setInterval(checkMedicineSchedule, 60000);
+app.timer('checkMedicineSchedule', {
+  schedule: '0 */1 * * * *',
+  handler: checkMedicineSchedule
+});
+
+module.exports = checkMedicineSchedule;

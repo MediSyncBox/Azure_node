@@ -1,26 +1,41 @@
 const express = require('express');
+const router = express.Router();
 const sql = require('mssql');
 const dbConfig = require('../dbConfig');
-const router = express.Router();
 
-// Function to update the taken status of a schedule
-async function updateTakenStatus(req, res) {
-    const { id, taken } = req.body; // Get the id and new taken status from the request body
+async function updateMedicineTaken(req, res) {
+  const { boxId, tankId, medicineName, scheduledTime } = req.body;
 
-    try {
-        let pool = await sql.connect(dbConfig);
-        let result = await pool.request()
-            .input('id', sql.Int, id)
-            .input('taken', sql.Bit, taken)
-            .query('UPDATE [dbo].[schedule] SET taken = @taken WHERE id = @id;');
+  try {
+    let pool = await sql.connect(dbConfig);
 
-        res.status(200).send('Taken status updated successfully.');
-    } catch (err) {
-        console.error('Failed to update taken status:', err.message);
-        res.status(500).send(err.message);
+    // Query the medicine table to find the matching entry
+    const result = await pool.request()
+      .input('boxId', sql.Int, boxId)
+      .input('tankId', sql.Int, tankId)
+      .input('medicineName', sql.VarChar, medicineName)
+      .input('scheduledTime', sql.VarChar, scheduledTime)
+      .query('SELECT * FROM dbo.medicine WHERE box_id = @boxId AND tank_id = @tankId AND medicine_name = @medicineName AND scheduled_time = @scheduledTime');
+
+    if (result.recordset.length > 0) {
+      // Matching entry found, update the taken field
+      await pool.request()
+        .input('boxId', sql.Int, boxId)
+        .input('tankId', sql.Int, tankId)
+        .input('medicineName', sql.VarChar, medicineName)
+        .input('scheduledTime', sql.VarChar, scheduledTime)
+        .query('UPDATE dbo.medicine SET taken = 1 WHERE box_id = @boxId AND tank_id = @tankId AND medicine_name = @medicineName AND scheduled_time = @scheduledTime');
+
+      res.json({ message: 'Medicine marked as taken successfully' });
+    } else {
+      res.status(404).json({ message: 'No matching medicine entry found' });
     }
+  } catch (err) {
+    console.error('SQL error:', err);
+    res.status(500).json({ message: 'Internal server error' });
+  }
 }
 
-router.post('/updateTakenStatus', updateTakenStatus);
+router.post('/updateMedicineTaken', updateMedicineTaken);
 
 module.exports = router;
