@@ -39,7 +39,7 @@ async function checkMedicineSchedule() {
 
             // Create the HTTPS URL for your main.cpp to listen to
             const options = {
-              hostname: 'your-main-cpp-url.com',
+              hostname: 'https://medisyncconnection.azurewebsites.net/api/',
               path: `/medicine-reminder/${boxId}`,
               method: 'POST',
               headers: {
