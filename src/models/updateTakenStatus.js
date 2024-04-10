@@ -3,7 +3,7 @@ const router = express.Router();
 const sql = require('mssql');
 const dbConfig = require('../dbConfig');
 
-async function updateMedicineTaken(req, res) {
+async function updateTakenStatus(req, res) {
   const { boxId, tankId, medicineName, scheduledTime } = req.body;
 
   try {
@@ -36,6 +36,6 @@ async function updateMedicineTaken(req, res) {
   }
 }
 
-router.post('/updateMedicineTaken', updateMedicineTaken);
+router.post('/updateTakenStatus', updateMedicineTaken);
 
 module.exports = router;
