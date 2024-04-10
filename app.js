@@ -12,8 +12,8 @@ const updateTakenStatusRoutes = require('./src/models/updateTakenStatus');
 const getPatientRoutes = require('./src/models/getPatient');
 const addPatientRoutes = require('./src/models/addPatient');
 const setTankInfo = require('./src/models/setTankInfo');
-const checkMedicineSchedule = require('./src/models/checkMedicineSchedule');
-const updateTakenStatus = require('./src/models/updateTakenStatus');
+//const checkMedicineSchedule = require('./src/models/checkMedicineSchedule');
+//const updateTakenStatus = require('./src/models/updateTakenStatus');
 
 app.use(express.json());
 app.get('/api/test', (req, res) => {
@@ -31,9 +31,9 @@ app.use('/api', updateSchedulesRoutes);
 app.use('/api', updateTakenStatusRoutes);
 app.use('/api', getPatientRoutes);
 app.use('/api', addPatientRoutes);
-app.use('/api', checkMedicineSchedule);
+//app.use('/api', checkMedicineSchedule);
 app.use('/api', setTankInfo);
-app.use('/api', updateTakenStatus);
+//app.use('/api', updateTakenStatus);
 
 
 const port = process.env.PORT || 3000;
