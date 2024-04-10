@@ -14,14 +14,14 @@ async function setTankInfo(req, res) {
     // Check if a record with the same boxId and tankNumber already exists
     const existingRecord = await pool.request()
       .input('box_id', sql.Int, boxId)
-      .input('servo_id', sql.Int, tankNumber)
+      .input('servo_id', sql.Int, servo_id)
       .query('SELECT * FROM [dbo].[tank] WHERE box_id = @box_id AND servo_id = @servo_id');
 
     if (existingRecord.recordset.length > 0) {
       // Update the existing record
       await pool.request()
         .input('box_id', sql.Int, boxId)
-        .input('servo_id', sql.Int, tankNumber)
+        .input('servo_id', sql.Int, servo_id)
         .input('temperature', sql.Float, temperature)
         .input('humidity', sql.Float, humidity)
         .query('UPDATE dbo.tank SET temperature = @temperature, humidity = @humidity WHERE box_id = @box_id AND servo_id = @servo_id');
@@ -29,7 +29,7 @@ async function setTankInfo(req, res) {
       // Insert a new record
       await pool.request()
         .input('box_id', sql.Int, boxId)
-        .input('servo_id', sql.Int, tankNumber)
+        .input('servo_id', sql.Int, servo_id)
         .input('temperature', sql.Float, temperature)
         .input('humidity', sql.Float, humidity)
         .query('INSERT INTO dbo.tank (box_id, servo_id, temperature, humidity) VALUES (@box_id, @servo_id, @temperature, @humidity)');
