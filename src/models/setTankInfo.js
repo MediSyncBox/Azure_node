@@ -4,7 +4,9 @@ const sql = require('mssql');
 const dbConfig = require('../dbConfig');
 
 async function setTankInfo(req, res) {
-  const { box_id, servo_id, temperature, humidity } = req.body;
+  const boxId = req.params.boxId;  
+  const { servo_id, temperature, humidity } = req.body;  
+
 
   try {
     let pool = await sql.connect(dbConfig);
