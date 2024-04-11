@@ -63,4 +63,4 @@ async function checkMedicineSchedule(res) {
 }
 
 // Run the checkMedicineSchedule function every minute
-setInterval(checkMedicineSchedule, 60000);
+//setInterval(checkMedicineSchedule, 60000);
