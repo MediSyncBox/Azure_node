@@ -3,15 +3,15 @@ const dbConfig = require('./dbConfig');
 const http = require('http');
 
 async function checkMedicineSchedule(res) {
-  const currentTime = new Date().toLocaleTimeString();
+  const currentTime = new Date().toISOString().slice(0, -1) + '0000000';
 
   try {
     let pool = await sql.connect(dbConfig);
 
     // Query the schedule table to check for matching scheduled times
     const scheduleResult = await pool.request()
-      .input('currentTime', sql.VarChar, currentTime)
-      .query('SELECT * FROM dbo.schedule WHERE time = @currentTime');
+      //.input('currentTime', sql.VarChar, currentTime)
+      .query('SELECT * FROM dbo.schedule WHERE id = 583');
 
     if (scheduleResult.recordset.length > 0) {
       // Matching schedules found
