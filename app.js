@@ -15,6 +15,7 @@ const addPatientRoutes = require('./src/models/addPatient');
 const getMedicinesRoutes = require('./src/models/getMedicines');
 const setTankInfo = require('./src/models/setTankInfo');
 // const checkMedicineSchedule = require('./src/models/checkMedicineSchedule');
+const batchDeleteRouter = require('./src/models/batchDelete');
 
 app.use(express.json());
 app.get('/api/test', (req, res) => {
@@ -36,6 +37,7 @@ app.use('/api', addPatientRoutes);
 app.use('/api', getMedicinesRoutes);
 // app.use('/api', checkMedicineSchedule);
 app.use('/api', setTankInfo);
+app.use('/api', batchDeleteRouter);
 
 
 const port = process.env.PORT || 3000;
