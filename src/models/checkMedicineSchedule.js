@@ -2,7 +2,7 @@ const sql = require('mssql');
 const dbConfig = require('./dbConfig');
 const http = require('http');
 
-async function checkMedicineSchedule() {
+async function checkMedicineSchedule(res) {
   const currentTime = new Date().toLocaleTimeString();
 
   try {
@@ -37,33 +37,13 @@ async function checkMedicineSchedule() {
           if (tankResult.recordset.length > 0) {
             const tankId = tankResult.recordset[0].id;
 
-            // Create the HTTPS URL for your main.cpp to listen to
-            const options = {
-              hostname: 'https://medisyncconnection.azurewebsites.net/api/',
-              path: `/medicine-reminder/${boxId}`,
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json'
-              }
-            };
-
-            // Send the message to the HTTPS URL
-            const req = http.request(options, (res) => {
-              console.log(`Medicine reminder sent for Box ID: ${boxId}, Tank ID: ${tankId}`);
-            });
-
-            req.on('error', (error) => {
-              console.error(`Error sending medicine reminder for Box ID: ${boxId}, Tank ID: ${tankId}`, error);
-            });
-
-            req.write(JSON.stringify({
+            res.json(JSON.stringify({
               boxId: boxId,
               tankId: tankId,
               medicineName: medicineName,
               scheduledTime: scheduledTime
             }));
 
-            req.end();
           } else {
             console.log(`No tank found for medicine: ${medicineName} and Box ID: ${boxId}`);
           }
@@ -75,7 +55,10 @@ async function checkMedicineSchedule() {
       console.log('No matching medicine schedules found');
     }
   } catch (err) {
-    console.log('SQL error:', err);
+    console.error('No matching time entries found');
+    res.status(200);
+            // Create the HTTPS URL for your main.cpp to listen to
+          
   }
 }
 
