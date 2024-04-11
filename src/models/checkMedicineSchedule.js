@@ -3,8 +3,8 @@ const dbConfig = require('./dbConfig');
 const http = require('http');
 
 async function checkMedicineSchedule(res) {
-  const currentTime = new Date().toLocaleTimeString();
-
+  const currentTime = new Date().toISOString().slice(0, -1) + '0000000';
+  
   try {
     let pool = await sql.connect(dbConfig);
 
