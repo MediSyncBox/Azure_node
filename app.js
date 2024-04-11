@@ -12,6 +12,7 @@ const updateSchedulesRoutes = require('./src/models/updateSchedules');
 const updateTakenStatusRoutes = require('./src/models/updateTakenStatus');
 const getPatientRoutes = require('./src/models/getPatient');
 const addPatientRoutes = require('./src/models/addPatient');
+const getMedicinesRoutes = require('./src/models/getMedicines');
 const setTankInfo = require('./src/models/setTankInfo');
 // const checkMedicineSchedule = require('./src/models/checkMedicineSchedule');
 
@@ -32,6 +33,7 @@ app.use('/api', updateSchedulesRoutes);
 app.use('/api', updateTakenStatusRoutes);
 app.use('/api', getPatientRoutes);
 app.use('/api', addPatientRoutes);
+app.use('/api', getMedicinesRoutes);
 // app.use('/api', checkMedicineSchedule);
 app.use('/api', setTankInfo);
 
