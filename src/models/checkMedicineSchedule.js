@@ -1,8 +1,10 @@
 const sql = require('mssql');
 const dbConfig = require('./dbConfig');
 const http = require('http');
+const router = express.Router();
 
-async function checkMedicineSchedule(res) {
+async function checkMedicineSchedule( res) {
+  // const { boxId } = req.params; 
   const currentTime = new Date().toISOString().slice(0, -1) + '0000000';
 
   try {
@@ -62,5 +64,8 @@ async function checkMedicineSchedule(res) {
   }
 }
 
+router.get('/medicine-reminder', checkMedicineSchedule);
+
+module.exports = router;
 // Run the checkMedicineSchedule function every minute
 //setInterval(checkMedicineSchedule, 60000);
