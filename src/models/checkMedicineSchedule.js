@@ -74,7 +74,7 @@ cron.schedule('* * * * *', async () => {
 });
 
 // Example route to display details based on boxId
-router.get('/boxes/:boxId/reminder', (req, res) => {
+router.get('api/boxes/:boxId/reminder', (req, res) => {
   const { boxId } = req.params;
   const { tankId, medicineName, scheduledTime } = req.query;
 
