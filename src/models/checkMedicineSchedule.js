@@ -38,8 +38,14 @@ async function checkMedicineSchedule(req, res) {
           //  scheduledTime: scheduledTime
           //});
           // Redirect or construct a URL with boxId
-          const redirectUrl = `/api/boxes/${boxId}/reminder?tankId=${tankId}&medicineName=${encodeURIComponent(medicineName)}&scheduledTime=${encodeURIComponent(scheduledTime)}`;
-          
+          const redirectUrl = url.format({
+            pathname: `/api/boxes/${boxId}/reminder`,
+            query: {
+              tankId: tankId,
+              medicineName: medicineName,
+              scheduledTime: scheduledTime
+            }
+          });
           // Redirect to the URL
           res.redirect(redirectUrl);
 
@@ -62,7 +68,8 @@ async function checkMedicineSchedule(req, res) {
 cron.schedule('* * * * *', async () => {
   // Mimic a request and response object if necessary
   let req = {}; // dummy request object
-  let res = { json: console.log, send: console.log, status: () => ({ send: console.log }) }; // dummy response object
+  let res = { redirect: console.log }; // dummy response object with redirect method
+
   await checkMedicineSchedule(req, res);
 });
 
