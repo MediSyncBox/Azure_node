@@ -1,7 +1,8 @@
 const sql = require('mssql');
 const dbConfig = require('./dbConfig');
-const http = require('http');
+//const http = require('http');
 const router = express.Router();
+const cron = require('node-cron');
 
 async function checkMedicineSchedule( res) {
   // const { boxId } = req.params; 
@@ -13,7 +14,7 @@ async function checkMedicineSchedule( res) {
     // Query the schedule table to check for matching scheduled times
     const scheduleResult = await pool.request()
       //.input('currentTime', sql.VarChar, currentTime)
-      .query('SELECT * FROM dbo.schedule WHERE id = 583');
+      .query('SELECT * FROM dbo.schedule WHERE id = 600');
 
     if (scheduleResult.recordset.length > 0) {
       // Matching schedules found
@@ -31,25 +32,25 @@ async function checkMedicineSchedule( res) {
           const boxId = userBoxResult.recordset[0].box_id;
 
           // Query the tank table to get the tank_id for the medicine and box
-          const tankResult = await pool.request()
-            .input('medicineName', sql.VarChar, medicineName)
-            .input('boxId', sql.Int, boxId)
-            .query('SELECT id FROM dbo.tank WHERE pillName = @medicineName AND box_id = @boxId');
+          //const tankResult = await pool.request()
+          //  .input('medicineName', sql.VarChar, medicineName)
+          //  .input('boxId', sql.Int, boxId)
+          //  .query('SELECT id FROM dbo.tank WHERE pillName = @medicineName AND box_id = @boxId');
 
-          if (tankResult.recordset.length > 0) {
-            const tankId = tankResult.recordset[0].id;
-
-            res.json(JSON.stringify({
+          //if (tankResult.recordset.length > 0) {
+          //  const tankId = tankResult.recordset[0].id;
+          const tankId = 2;
+          res.json(JSON.stringify({
               boxId: boxId,
               tankId: tankId,
               medicineName: medicineName,
               scheduledTime: scheduledTime
             }));
 
-          } else {
-            console.log(`No tank found for medicine: ${medicineName} and Box ID: ${boxId}`);
+          //} else {
+          //  console.log(`No tank found for medicine: ${medicineName} and Box ID: ${boxId}`);
           }
-        } else {
+         else {
           console.log(`No box found for User ID: ${userId}`);
         }
       }
@@ -63,6 +64,11 @@ async function checkMedicineSchedule( res) {
           
   }
 }
+
+//cron runs every minute
+cron.schedule('* * * * *', () => {
+  checkMedicineSchedule();
+});
 
 router.get('/medicine-reminder', checkMedicineSchedule);
 
