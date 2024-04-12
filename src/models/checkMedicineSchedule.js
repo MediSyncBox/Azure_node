@@ -31,14 +31,16 @@ async function checkMedicineSchedule(req, res) {
 
           // Dummy tank ID for demonstration
           const tankId = 2;
-          res.json({
-            boxId: boxId,
-            tankId: tankId,
-            medicineName: medicineName,
-            scheduledTime: scheduledTime
-          });
+          //res.json({
+          //  boxId: boxId,
+          //  tankId: tankId,
+          //  medicineName: medicineName,
+          //  scheduledTime: scheduledTime
+          //});
           // Redirect or construct a URL with boxId
-          const redirectUrl = `/api/boxes/${boxId}/reminder?tankId=${tankId}&medicineName=${encodeURIComponent(medicineName)}&scheduledTime=${encodeURIComponent(scheduledTime)}`;
+          const redirectUrl = `/api/boxes/${boxId}/reminder?tankId=${tankId}`
+           // &medicineName=${encodeURIComponent(medicineName)}&scheduledTime=${encodeURIComponent(scheduledTime)}`;
+         
           res.redirect(redirectUrl);
 
         } else {
@@ -67,8 +69,8 @@ cron.schedule('* * * * *', async () => {
 // Example route to display details based on boxId
 router.get('/boxes/:boxId/reminder', (req, res) => {
   const { boxId } = req.params;
-  const { tankId, medicineName, scheduledTime } = req.query;
-  res.send(` ${boxId} ${tankId} ${medicineName} ${scheduledTime} `);
+  const { tankId } = req.query;
+  res.send(` ${boxId} ${tankId} `);
   //res.json({
   //  boxId: boxId,
   //  tankId: tankId,
