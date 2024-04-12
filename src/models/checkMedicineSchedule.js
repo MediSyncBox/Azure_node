@@ -39,7 +39,7 @@ async function checkMedicineSchedule(req, res) {
           //});
           // Redirect or construct a URL with boxId
           const redirectUrl = url.format({
-            pathname: `/api/boxes/${boxId}/reminder`,
+            pathname: `/boxes/${boxId}/reminder`,
             query: {
               tankId: tankId,
               medicineName: medicineName,
@@ -74,7 +74,7 @@ cron.schedule('* * * * *', async () => {
 });
 
 // Example route to display details based on boxId
-router.get('api/boxes/:boxId/reminder', (req, res) => {
+router.get('/boxes/:boxId/reminder', (req, res) => {
   const { boxId } = req.params;
   const { tankId, medicineName, scheduledTime } = req.query;
 
