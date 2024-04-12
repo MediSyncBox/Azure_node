@@ -1,20 +1,17 @@
 const express = require('express');
 const sql = require('mssql');
 const dbConfig = require('./dbConfig');
-//const http = require('http');
 const router = express.Router();
 const cron = require('node-cron');
 
-async function checkMedicineSchedule(req, res){
-  //   // const { boxId } = req.params; 
-  const currentTime = new Date().toISOString().slice(0, -1) + '0000000';
+async function checkMedicineSchedule(req, res) {
+   const currentTime = new Date().toISOString().slice(0, -1) + '0000000';
 
-  try {
-    let pool = await sql.connect(dbConfig);
+   try {
+     let pool = await sql.connect(dbConfig);
 
     // Query the schedule table to check for matching scheduled times
     const scheduleResult = await pool.request()
-      //.input('currentTime', sql.VarChar, currentTime)
       .query('SELECT * FROM dbo.schedule WHERE id = 600');
 
     if (scheduleResult.recordset.length > 0) {
@@ -32,43 +29,33 @@ async function checkMedicineSchedule(req, res){
         if (userBoxResult.recordset.length > 0) {
           const boxId = userBoxResult.recordset[0].box_id;
 
-
-          // Query the tank table to get the tank_id for the medicine and box
-          //const tankResult = await pool.request()
-          //  .input('medicineName', sql.VarChar, medicineName)
-          //  .input('boxId', sql.Int, boxId)
-          //  .query('SELECT id FROM dbo.tank WHERE pillName = @medicineName AND box_id = @boxId');
-
-          //if (tankResult.recordset.length > 0) {
-          //  const tankId = tankResult.recordset[0].id;
+          // Dummy tank ID for demonstration
           const tankId = 2;
-          res.json(JSON.stringify({
+          res.json({
             boxId: boxId,
             tankId: tankId,
             medicineName: medicineName,
             scheduledTime: scheduledTime
-          }));
+          });
 
-          //} else {
-          //  console.log(`No tank found for medicine: ${medicineName} and Box ID: ${boxId}`);
-        }
-        else {
+        } else {
           console.log(`No box found for User ID: ${userId}`);
+          res.status(404).send(`No box found for User ID: ${userId}`);
         }
       }
     } else {
       console.log('No matching medicine schedules found');
+      res.status(404).send('No matching medicine schedules found');
     }
   } catch (err) {
-    console.error('No matching time entries found');
-    res.status(200);
-    // Create the HTTPS URL for your main.cpp to listen to
-
+    console.error('Database error:', err);
+    res.status(500).send('Database error');
   }
 }
 
 //cron runs every minute
-cron.schedule('* * * * *', () => {
+cron.schedule('* * * * *', async () => {
+  // Mimic a request and response object if necessary
   let req = {}; // dummy request object
   let res = { json: console.log, send: console.log, status: () => ({ send: console.log }) }; // dummy response object
   await checkMedicineSchedule(req, res);
@@ -76,7 +63,4 @@ cron.schedule('* * * * *', () => {
 
 router.get('/medicine-reminder', checkMedicineSchedule);
 
-
 module.exports = router;
-// // Run the checkMedicineSchedule function every minute
-// //setInterval(checkMedicineSchedule, 60000);
