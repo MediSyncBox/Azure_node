@@ -38,9 +38,9 @@ async function checkMedicineSchedule(req, res) {
           //  scheduledTime: scheduledTime
           //});
           // Redirect or construct a URL with boxId
-          const redirectUrl = `/api/boxes/${boxId}/reminder?tankId=${tankId}`
-           // &medicineName=${encodeURIComponent(medicineName)}&scheduledTime=${encodeURIComponent(scheduledTime)}`;
-         
+          const redirectUrl = `/api/boxes/${boxId}/reminder?tankId=${tankId}&medicineName=${encodeURIComponent(medicineName)}&scheduledTime=${encodeURIComponent(scheduledTime)}`;
+          
+          // Redirect to the URL
           res.redirect(redirectUrl);
 
         } else {
@@ -69,14 +69,14 @@ cron.schedule('* * * * *', async () => {
 // Example route to display details based on boxId
 router.get('/boxes/:boxId/reminder', (req, res) => {
   const { boxId } = req.params;
-  const { tankId } = req.query;
-  res.send(` ${boxId} ${tankId} `);
-  //res.json({
-  //  boxId: boxId,
-  //  tankId: tankId,
-  //  medicineName: medicineName,
-  //  scheduledTime: scheduledTime
-  //});
+  const { tankId, medicineName, scheduledTime } = req.query;
+
+  res.json({
+    boxId: boxId,
+    tankId: tankId,
+    medicineName: medicineName,
+    scheduledTime: scheduledTime
+  });
   //res.send(`Reminder for boxId ${boxId}`);
 });
 
