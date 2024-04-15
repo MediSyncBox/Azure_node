@@ -78,7 +78,7 @@ router.get('/boxes/:boxId/reminder', (req, res) => {
   const { boxId } = req.params;
   const { tankId, medicineName, scheduledTime } = req.query;
 
-  console.log(req.query, tankId, medicineName, scheduledTime);
+  //console.log(req.query, tankId, medicineName, scheduledTime);
   //res.json({
   //  boxId: boxId,
   //  tankId: tankId,
