@@ -39,12 +39,13 @@ async function checkMedicineSchedule(req, res) {
             medicineName,
             scheduledTime
           });
+          res.json(scheduleData);
         } else {
           console.log(`No box found for User ID: ${userId}`);
         }
       }
 
-      res.json(scheduleData);
+      
     } else {
       console.log('No matching medicine schedules found');
       res.status(404).send('No matching medicine schedules found');
