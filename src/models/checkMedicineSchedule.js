@@ -76,14 +76,15 @@ cron.schedule('* * * * *', async () => {
 // Example route to display details based on boxId
 router.get('/boxes/:boxId/reminder', (req, res) => {
   const { boxId } = req.params;
-  const { tankId, medicineName, scheduledTime } = req.query;
+  const { tankId, medicineName, scheduledTime } = req.params;
 
-  res.json({
-    boxId: boxId,
-    tankId: tankId,
-    medicineName: medicineName,
-    scheduledTime: scheduledTime
-  });
+  console.log(req.query, tankId, medicineName, scheduledTime);
+  //res.json({
+  //  boxId: boxId,
+  //  tankId: tankId,
+  //  medicineName: medicineName,
+  //  scheduledTime: scheduledTime
+  //});
   //res.send(`Reminder for boxId ${boxId}`);
 });
 
