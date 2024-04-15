@@ -1,5 +1,6 @@
 const express = require('express');
 const sql = require('mssql');
+const url = require('node:url');
 const dbConfig = require('../dbConfig');
 const router = express.Router();
 const cron = require('node-cron');
@@ -38,14 +39,7 @@ async function checkMedicineSchedule(req, res) {
           //  scheduledTime: scheduledTime
           //});
           // Redirect or construct a URL with boxId
-          const redirectUrl = url.format({
-            pathname: `/boxes/${boxId}/reminder`,
-            query: {
-              tankId: tankId,
-              medicineName: medicineName,
-              scheduledTime: scheduledTime
-            }
-          });
+          const redirectUrl = `/boxes/${boxId}/reminder?tankId=${tankId}&medicineName=${encodeURIComponent(medicineName)}&scheduledTime=${encodeURIComponent(scheduledTime)}`;
           // Redirect to the URL
           res.redirect(redirectUrl);
 
@@ -79,12 +73,12 @@ router.get('/boxes/:boxId/reminder', (req, res) => {
   const { tankId, medicineName, scheduledTime } = req.query;
 
   //console.log(req.query, tankId, medicineName, scheduledTime);
-  //res.json({
-  //  boxId: boxId,
-  //  tankId: tankId,
-  //  medicineName: medicineName,
-  //  scheduledTime: scheduledTime
-  //});
+  res.json({
+    boxId: boxId,
+    tankId: tankId,
+    medicineName: medicineName,
+    scheduledTime: scheduledTime
+  });
   //res.send(`Reminder for boxId ${boxId}`);
 });
 
