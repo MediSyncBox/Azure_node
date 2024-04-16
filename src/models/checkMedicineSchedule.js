@@ -57,8 +57,10 @@ async function checkMedicineSchedule(req, res) {
         tankId: -1}); // Send an empty JSON object
     }
   } catch (err) {
-    console.error('Database error:', err);
-    res.status(500).json({ error: 'Database error' });
+    //console.error('Database error:', err);
+    //res.status(500).json({ error: 'Database error' });
+    res.json({boxId: boxId,
+      tankId: -1});
   }
 }
 
