@@ -5,10 +5,10 @@ const router = express.Router();
 const cron = require('node-cron');
 
 async function checkMedicineSchedule(req, res) {
-  const currentTime = new Date().toISOString().slice(0, -1) + '0000000';
+   const currentTime = new Date().toISOString().slice(0, -1) + '0000000';
 
-  try {
-    let pool = await sql.connect(dbConfig);
+   try {
+     let pool = await sql.connect(dbConfig);
 
     // Query the schedule table to check for matching scheduled times
     const scheduleResult = await pool.request()
@@ -16,8 +16,6 @@ async function checkMedicineSchedule(req, res) {
 
     if (scheduleResult.recordset.length > 0) {
       // Matching schedules found
-      const scheduleData = [];
-
       for (const schedule of scheduleResult.recordset) {
         const userId = schedule.user_id;
         const medicineName = schedule.medicine;
@@ -30,22 +28,32 @@ async function checkMedicineSchedule(req, res) {
 
         if (userBoxResult.recordset.length > 0) {
           const boxId = userBoxResult.recordset[0].box_id;
+
           // Dummy tank ID for demonstration
           const tankId = 2;
-
-          scheduleData.push({
-            boxId,
-            tankId,
-            medicineName,
-            scheduledTime
+          //res.json({
+          //  boxId: boxId,
+          //  tankId: tankId,
+          //  medicineName: medicineName,
+          //  scheduledTime: scheduledTime
+          //});
+          // Redirect or construct a URL with boxId
+          const redirectUrl = url.format({
+            pathname: `/boxes/${boxId}/reminder`,
+            query: {
+              tankId: tankId,
+              medicineName: medicineName,
+              scheduledTime: scheduledTime
+            }
           });
-          res.json(scheduleData);
+          // Redirect to the URL
+          res.redirect(redirectUrl);
+
         } else {
           console.log(`No box found for User ID: ${userId}`);
+          res.status(404).send(`No box found for User ID: ${userId}`);
         }
       }
-
-      
     } else {
       console.log('No matching medicine schedules found');
       res.status(404).send('No matching medicine schedules found');
@@ -56,12 +64,27 @@ async function checkMedicineSchedule(req, res) {
   }
 }
 
-// cron runs every minute
-cron.schedule('* *', async () => {
+//cron runs every minute
+cron.schedule('* * * * *', async () => {
   // Mimic a request and response object if necessary
   let req = {}; // dummy request object
-  let res = { json: console.log }; // dummy response object with json method
+  let res = { redirect: console.log }; // dummy response object with redirect method
+
   await checkMedicineSchedule(req, res);
+});
+
+// Example route to display details based on boxId
+router.get('/boxes/:boxId/reminder', (req, res) => {
+  const { boxId } = req.params;
+  const { tankId, medicineName, scheduledTime } = req.query;
+
+  res.json({
+    boxId: boxId,
+    tankId: tankId,
+    medicineName: medicineName,
+    scheduledTime: scheduledTime
+  });
+  //res.send(`Reminder for boxId ${boxId}`);
 });
 
 router.get('/medicine-reminder', checkMedicineSchedule);
