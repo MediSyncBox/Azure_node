@@ -17,6 +17,8 @@ const setTankInfo = require('./src/models/setTankInfo');
 const checkMedicineSchedule = require('./src/models/checkMedicineSchedule');
 const batchDeleteRouter = require('./src/models/batchDelete');
 const singleDeleteRouter = require('./src/models/singleDelete');
+const checkCron = require('./src/models/checkCron');
+
 
 app.use(express.json());
 app.get('/api/test', (req, res) => {
@@ -40,7 +42,7 @@ app.use('/api', checkMedicineSchedule);
 app.use('/api', setTankInfo);
 app.use('/api', batchDeleteRouter);
 app.use('/api', singleDeleteRouter);
-
+app.use('/api', checkCron);
 
 const port = process.env.PORT || 3000;
 app.listen(port, () => {
