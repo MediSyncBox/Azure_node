@@ -43,15 +43,18 @@ async function checkMedicineSchedule(req, res) {
           });
         } else {
           console.log(`Box ID mismatch: Requested Box ID: ${boxId}, User Box ID: ${userBoxId}`);
-          res.json({}); // Send an empty JSON object
+          res.json({boxId: boxId,
+            tankId: -1}); // Send an empty JSON object
         }
       } else {
         console.log(`No box found for User ID: ${userId}`);
-        res.json({}); // Send an empty JSON object
+        res.json({boxId: boxId,
+          tankId: -1}); // Send an empty JSON object
       }
     } else {
       console.log('No matching medicine schedules found');
-      res.json({}); // Send an empty JSON object
+      res.json({boxId: boxId,
+        tankId: -1}); // Send an empty JSON object
     }
   } catch (err) {
     console.error('Database error:', err);
