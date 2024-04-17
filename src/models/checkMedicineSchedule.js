@@ -44,7 +44,7 @@ async function checkMedicineSchedule(req, res) {
         if (matchedSchedule) {
           const scheduledTime = matchedSchedule.time;
           const medicineName = matchedSchedule.medicine;
-          //const dose = matchedSchedule.dose;
+          const dose = matchedSchedule.dose;
 
           // Dummy tank ID for demonstration
           const tankId = 2;
