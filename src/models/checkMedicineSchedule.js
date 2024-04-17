@@ -35,7 +35,7 @@ async function checkMedicineSchedule(req, res) {
           const scheduledDateTime = new Date(schedule.time);
           const timeDifference = Math.abs(currentDateTime - scheduledDateTime);
 
-          if (timeDifference <= 60000 && timeDifference < minTimeDifference) {
+          if (timeDifference <= 5000 && timeDifference < minTimeDifference) {
             matchedSchedule = schedule;
             minTimeDifference = timeDifference;
           }
