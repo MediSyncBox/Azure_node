@@ -8,30 +8,35 @@ async function addBox(req, res) {
     try {
         let pool = await sql.connect(dbConfig);
 
-        // Check if the box exists
+        // Check if the box is associated with the user
         const boxExists = await pool.request()
             .input('boxId', sql.Int, boxId)
-            .query('SELECT * FROM dbo.box WHERE id = @boxId;');
-
-        if (boxExists.recordset.length === 0) {
-            return res.status(404).json({ message: 'Box not found.' });
-        }
-
-        // Insert a new entry in the user_box table, including the name column
-        await pool.request()
             .input('userId', sql.Int, userId)
-            .input('boxId', sql.Int, boxId)
-            .input('name', sql.NVarChar, name)
-            .input('isUserOwnBox', sql.Bit, isUserOwnBox)
-            .query('INSERT INTO dbo.user_box (user_id, box_id, name, IsUserOwnBox) VALUES (@userId, @boxId, @name, @isUserOwnBox);');
+            .query('SELECT * FROM dbo.user_box WHERE box_id = @boxId AND user_id = @userId;');
 
-        res.json({ message: 'Box successfully added to user with name.' });
+        if (boxExists.recordset.length > 0) {
+            // Box exists, update the existing entry
+            await pool.request()
+                .input('userId', sql.Int, userId)
+                .input('boxId', sql.Int, boxId)
+                .input('name', sql.NVarChar, name)
+                .input('isUserOwnBox', sql.Bit, isUserOwnBox)
+                .query('UPDATE dbo.user_box SET name = @name, IsUserOwnBox = @isUserOwnBox WHERE box_id = @boxId AND user_id = @userId;');
+            
+            return res.json({ message: 'Box info updated successfully.' });
+        } else {
+            // Box does not exist, add new entry
+            await pool.request()
+                .input('userId', sql.Int, userId)
+                .input('boxId', sql.Int, boxId)
+                .input('name', sql.NVarChar, name)
+                .input('isUserOwnBox', sql.Bit, isUserOwnBox)
+                .query('INSERT INTO dbo.user_box (user_id, box_id, name, IsUserOwnBox) VALUES (@userId, @boxId, @name, @isUserOwnBox);');
 
-        // const schemaInfo = await pool.request().query('SELECT COLUMN_NAME, DATA_TYPE FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = \'user_box\'');
-        // console.log(schemaInfo.recordset);
-
+            return res.json({ message: 'New box successfully added to user.' });
+        }
     } catch (err) {
-        console.error('Failed to add box to user with name:', err.message);
+        console.error('Failed to modify or add box:', err.message);
         res.status(500).json({ message: err.message });
     }
 }
