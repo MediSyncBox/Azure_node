@@ -21,6 +21,7 @@ async function checkMedicineSchedule(req, res) {
       const userId = schedule.user_id;
       const medicineName = schedule.medicine;
       const scheduledTime = schedule.time;
+      const dose = schedule.dose;
 
       // Query the user_box table to get the box_id for the user
       const userBoxResult = await pool.request()
@@ -39,7 +40,8 @@ async function checkMedicineSchedule(req, res) {
             boxId: boxId,
             tankId: tankId,
             medicineName: medicineName,
-            scheduledTime: scheduledTime
+            scheduledTime: scheduledTime,
+            dose : dose
           });
         } else {
           console.log(`Box ID mismatch: Requested Box ID: ${boxId}, User Box ID: ${userBoxId}`);
