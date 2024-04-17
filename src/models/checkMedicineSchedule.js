@@ -49,7 +49,7 @@ async function checkMedicineSchedule(req, res) {
           // Get the correct tank ID 
           // Query the tank table to get the tank_id for the medicine and box
           const tankResult = await pool.request()
-            .input('medicineName', sql.VarChar, medicineName)
+            .input('medicineName', sql.NVarChar, medicineName)
             .input('boxId', sql.Int, boxId)
             .query('SELECT id FROM dbo.tank WHERE pillName = @medicineName AND box_id = @boxId');
           
