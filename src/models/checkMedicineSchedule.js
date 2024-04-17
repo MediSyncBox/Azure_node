@@ -62,7 +62,7 @@ async function checkMedicineSchedule(req, res) {
           res.json({
             boxId: boxId,
             tankId: tankId,
-            medicineName: medicineName,
+            medicineName: pillName,
             scheduledTime: scheduledTime,
             dose: dose
           });
