@@ -58,19 +58,19 @@ async function checkMedicineSchedule(req, res) {
           });
         } else {
           console.log('No matching medicine schedules found within the allowed time difference');
-          res.json({ boxId: boxId, tankId: -1 });
+          res.json({ boxId: boxId, tankId: -1, dose : -1 });
         }
       } else {
         console.log(`No untaken medicine schedules found for User ID: ${userId}`);
-        res.json({ boxId: boxId, tankId: -2 });
+        res.json({ boxId: boxId, tankId: -2 , dose : -2});
       }
     } else {
       console.log(`No user found for Box ID: ${boxId}`);
-      res.json({ boxId: boxId, tankId: -3 });
+      res.json({ boxId: boxId, tankId: -3, dose : -3 });
     }
   } catch (err) {
     console.error('Database error:', err);
-    res.json({ boxId: boxId, tankId: -4 });
+    res.json({ boxId: boxId, tankId: -4, dose : -4 });
   }
 }
 
