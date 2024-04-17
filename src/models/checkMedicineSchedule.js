@@ -3,6 +3,7 @@ const sql = require('mssql');
 const dbConfig = require('../dbConfig');
 const router = express.Router();
 
+
 async function checkMedicineSchedule(req, res) {
   const { boxId } = req.params;
   const { currentTime } = req.body;
@@ -18,22 +19,32 @@ async function checkMedicineSchedule(req, res) {
     if (userBoxResult.recordset.length > 0) {
       const userId = userBoxResult.recordset[0].user_id;
 
-      // Query the schedule table for the earliest scheduled time with taken = 0 for the userId
+      // Query the schedule table for all untaken schedules for the userId
       const scheduleResult = await pool.request()
         .input('userId', sql.Int, userId)
-        .query('SELECT TOP 1 * FROM dbo.schedule WHERE user_id = @userId AND taken = 0 ORDER BY time ASC');
+        .query('SELECT * FROM dbo.schedule WHERE user_id = @userId AND taken = 0');
 
       if (scheduleResult.recordset.length > 0) {
-        const earliestSchedule = scheduleResult.recordset[0];
-        const scheduledTime = earliestSchedule.time;
-        const medicineName = earliestSchedule.medicine;
-
-        // Check if the scheduled time is within the allowed time difference (1 minute)
         const currentDateTime = new Date(currentTime);
-        const scheduledDateTime = new Date(scheduledTime);
-        const timeDifference = Math.abs(currentDateTime - scheduledDateTime);
 
-        if (timeDifference <= 60000) {
+        // Find the schedule with the minimum time difference within the allowed range
+        let matchedSchedule = null;
+        let minTimeDifference = Infinity;
+
+        for (const schedule of scheduleResult.recordset) {
+          const scheduledDateTime = new Date(schedule.time);
+          const timeDifference = Math.abs(currentDateTime - scheduledDateTime);
+
+          if (timeDifference <= 60000 && timeDifference < minTimeDifference) {
+            matchedSchedule = schedule;
+            minTimeDifference = timeDifference;
+          }
+        }
+
+        if (matchedSchedule) {
+          const scheduledTime = matchedSchedule.time;
+          const medicineName = matchedSchedule.medicine;
+
           // Dummy tank ID for demonstration
           const tankId = 2;
 
@@ -46,11 +57,11 @@ async function checkMedicineSchedule(req, res) {
           });
         } else {
           console.log('No matching medicine schedules found within the allowed time difference');
-          res.json({ boxId: boxId, tankId: -3 });
+          res.json({ boxId: boxId, tankId: -1 });
         }
       } else {
         console.log(`No untaken medicine schedules found for User ID: ${userId}`);
-        res.json({ boxId: boxId, tankId: -3 });
+        res.json({ boxId: boxId, tankId: -2 });
       }
     } else {
       console.log(`No user found for Box ID: ${boxId}`);
@@ -58,8 +69,7 @@ async function checkMedicineSchedule(req, res) {
     }
   } catch (err) {
     console.error('Database error:', err);
-    res.json({ boxId: boxId, tankId: -3 });
-    //res.status(500).json({ error: 'Database error' });
+    res.json({ boxId: boxId, tankId: -4 });
   }
 }
 
