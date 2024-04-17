@@ -10,28 +10,30 @@ async function checkMedicineSchedule(req, res) {
   try {
     let pool = await sql.connect(dbConfig);
 
-    // Query the schedule table to check for matching scheduled times
-    const scheduleResult = await pool.request()
-      .input('currentTime', sql.VarChar, currentTime)
-      .query('SELECT * FROM dbo.schedule WHERE time = @currentTime');
+    // Query the user_box table to get the user_id for the given boxId
+    const userBoxResult = await pool.request()
+      .input('boxId', sql.Int, boxId)
+      .query('SELECT user_id FROM dbo.user_box WHERE box_id = @boxId');
 
-    if (scheduleResult.recordset.length > 0) {
-      // Matching schedule found
-      const schedule = scheduleResult.recordset[0];
-      const userId = schedule.user_id;
-      const medicineName = schedule.medicine;
-      const scheduledTime = schedule.time;
-      const dose = schedule.dose;
+    if (userBoxResult.recordset.length > 0) {
+      const userId = userBoxResult.recordset[0].user_id;
 
-      // Query the user_box table to get the box_id for the user
-      const userBoxResult = await pool.request()
+      // Query the schedule table for the earliest scheduled time with taken = 0 for the userId
+      const scheduleResult = await pool.request()
         .input('userId', sql.Int, userId)
-        .query('SELECT box_id FROM dbo.user_box WHERE user_id = @userId');
+        .query('SELECT TOP 1 * FROM dbo.schedule WHERE user_id = @userId AND taken = 0 ORDER BY time ASC');
 
-      if (userBoxResult.recordset.length > 0) {
-        const userBoxId = userBoxResult.recordset[0].box_id;
+      if (scheduleResult.recordset.length > 0) {
+        const earliestSchedule = scheduleResult.recordset[0];
+        const scheduledTime = earliestSchedule.time;
+        const medicineName = earliestSchedule.medicine;
 
-        if (userBoxId === parseInt(boxId)) {
+        // Check if the scheduled time is within the allowed time difference (1 minute)
+        const currentDateTime = new Date(currentTime);
+        const scheduledDateTime = new Date(scheduledTime);
+        const timeDifference = Math.abs(currentDateTime - scheduledDateTime);
+
+        if (timeDifference <= 60000) {
           // Dummy tank ID for demonstration
           const tankId = 2;
 
@@ -40,29 +42,23 @@ async function checkMedicineSchedule(req, res) {
             boxId: boxId,
             tankId: tankId,
             medicineName: medicineName,
-            scheduledTime: scheduledTime,
-            dose : dose
+            scheduledTime: scheduledTime
           });
         } else {
-          console.log(`Box ID mismatch: Requested Box ID: ${boxId}, User Box ID: ${userBoxId}`);
-          res.json({boxId: boxId,
-            tankId: -2}); // Send an empty JSON object
+          console.log('No matching medicine schedules found within the allowed time difference');
+          res.json({ boxId: boxId, tankId: -3 });
         }
       } else {
-        console.log(`No box found for User ID: ${userId}`);
-        res.json({boxId: boxId,
-          tankId: -2}); // Send an empty JSON object
+        console.log(`No untaken medicine schedules found for User ID: ${userId}`);
+        res.json({ boxId: boxId, tankId: -3 });
       }
     } else {
-      console.log('No matching medicine schedules found');
-      res.json({boxId: boxId,
-        tankId: -2}); // Send an empty JSON object
+      console.log(`No user found for Box ID: ${boxId}`);
+      res.json({ boxId: boxId, tankId: -3 });
     }
   } catch (err) {
-    //console.error('Database error:', err);
-    //res.status(500).json({ error: 'Database error' });
-    res.json({boxId: boxId,
-      tankId: -2});
+    console.error('Database error:', err);
+    res.status(500).json({ error: 'Database error' });
   }
 }
 
