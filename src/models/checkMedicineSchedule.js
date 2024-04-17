@@ -4,7 +4,7 @@ const dbConfig = require('../dbConfig');
 const router = express.Router();
 
 async function checkMedicineSchedule(req, res) {
-  const { boxId } = req.params.boxId;
+  const { boxId } = req.params;
   const { currentTime } = req.body;
 
   try {
