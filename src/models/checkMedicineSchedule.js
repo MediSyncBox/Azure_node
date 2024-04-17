@@ -4,7 +4,7 @@ const dbConfig = require('../dbConfig');
 const router = express.Router();
 
 async function checkMedicineSchedule(req, res) {
-  const { boxId } = req.params.boxId;
+  const { boxId } = req.params;
   const { currentTime } = req.body;
 
   try {
@@ -44,23 +44,23 @@ async function checkMedicineSchedule(req, res) {
         } else {
           console.log(`Box ID mismatch: Requested Box ID: ${boxId}, User Box ID: ${userBoxId}`);
           res.json({boxId: boxId,
-            tankId: -1}); // Send an empty JSON object
+            tankId: -2}); // Send an empty JSON object
         }
       } else {
         console.log(`No box found for User ID: ${userId}`);
         res.json({boxId: boxId,
-          tankId: -1}); // Send an empty JSON object
+          tankId: -2}); // Send an empty JSON object
       }
     } else {
       console.log('No matching medicine schedules found');
       res.json({boxId: boxId,
-        tankId: -1}); // Send an empty JSON object
+        tankId: -2}); // Send an empty JSON object
     }
   } catch (err) {
     //console.error('Database error:', err);
     //res.status(500).json({ error: 'Database error' });
     res.json({boxId: boxId,
-      tankId: -1});
+      tankId: -2});
   }
 }
 
