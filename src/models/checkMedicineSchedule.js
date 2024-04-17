@@ -44,6 +44,7 @@ async function checkMedicineSchedule(req, res) {
         if (matchedSchedule) {
           const scheduledTime = matchedSchedule.time;
           const medicineName = matchedSchedule.medicine;
+          const dose = matchedSchedule.dose;
 
           // Dummy tank ID for demonstration
           const tankId = 2;
@@ -53,7 +54,8 @@ async function checkMedicineSchedule(req, res) {
             boxId: boxId,
             tankId: tankId,
             medicineName: medicineName,
-            scheduledTime: scheduledTime
+            scheduledTime: scheduledTime, 
+            dose: dose
           });
         } else {
           console.log('No matching medicine schedules found within the allowed time difference');
