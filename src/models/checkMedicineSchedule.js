@@ -58,7 +58,8 @@ async function checkMedicineSchedule(req, res) {
     }
   } catch (err) {
     console.error('Database error:', err);
-    res.status(500).json({ error: 'Database error' });
+    res.json({ boxId: boxId, tankId: -3 });
+    //res.status(500).json({ error: 'Database error' });
   }
 }
 
