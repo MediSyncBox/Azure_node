@@ -46,17 +46,17 @@ async function checkMedicineSchedule(req, res) {
           const pillName = matchedSchedule.medicine;
           const dose = matchedSchedule.dose;
           const tankId = -1;
-
+          
           // Get the correct tank ID 
           // Query the tank table to get the tank_id for the medicine and box
-          const tankResult = await pool.request()
-            .input('pillName', sql.NVarChar, pillName)
-            .input('boxId', sql.Int, boxId)
-            .query('SELECT * FROM dbo.tank WHERE pillName = @pillName AND box_id = @boxId');
+          //const tankResult = await pool.request()
+          //  .input('pillName', sql.NVarChar, pillName)
+          //  .input('boxId', sql.Int, boxId)
+          //  .query('SELECT * FROM dbo.tank WHERE pillName = @pillName AND box_id = @boxId');
 
-          if (tankResult.recordset.length > 0) {
-            tankId = tankResult.recordset[0].id;
-          }
+          //if (tankResult.recordset.length > 0) {
+          //  tankId = tankResult.recordset[0].id;
+          //}
 
           // Send the information as a JSON string
           res.json({
