@@ -51,10 +51,10 @@ async function checkMedicineSchedule(req, res) {
           const tankResult = await pool.request()
             .input('medicineName', sql.NVarChar, medicineName)
             .input('boxId', sql.Int, boxId)
-            .query('SELECT id FROM dbo.tank WHERE pillName = @medicineName AND box_id = @boxId');
+            .query('SELECT * FROM dbo.tank WHERE pillName = @medicineName AND box_id = @boxId');
           
           if (tankResult.recordset.length > 0) {
-            const tankId = tankResult.recordset[0].id;
+            const tankId = tankResult.recordset[0].servo_id;
           }
           else{
             const tankId = -1;
