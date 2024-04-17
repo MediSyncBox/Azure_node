@@ -54,7 +54,8 @@ async function checkMedicineSchedule(req, res) {
             boxId: boxId,
             tankId: tankId,
             medicineName: medicineName,
-            scheduledTime: scheduledTime
+            scheduledTime: scheduledTime,
+            dose: dose
           });
         } else {
           console.log('No matching medicine schedules found within the allowed time difference');
