@@ -6,7 +6,7 @@ const router = express.Router();
 
 async function updateTakenStatusFromBox(req, res) {
   const { boxId } = req.params;
-  const { tankId, medicine, time, taken } = req.body;
+  const { tankId, medicine, time, taken, dose } = req.body;
 
   try {
     let pool = await sql.connect(dbConfig);
@@ -43,7 +43,7 @@ async function updateTakenStatusFromBox(req, res) {
                         .query('SELECT * FROM [dbo].[tank] WHERE box_id = @box_id AND servo_id = @servo_id');
 
                     if (existingRecord.recordset.length > 0) {
-                        const pillNumber = existingRecord.recordset[0].pillNumber - 1;
+                        const pillNumber = existingRecord.recordset[0].pillNumber - dose;
                         // Update the existing record
                         await pool.request()
                             .input('box_id', sql.Int, boxId)
