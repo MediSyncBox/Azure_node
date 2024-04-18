@@ -35,7 +35,7 @@ async function checkMedicineSchedule(req, res) {
           const scheduledDateTime = new Date(schedule.time);
           const timeDifference = Math.abs(currentDateTime - scheduledDateTime);
 
-          if (timeDifference <= 5000 && timeDifference < minTimeDifference) {
+          if (timeDifference <= 3500 && timeDifference < minTimeDifference) {
             matchedSchedule = schedule;
             minTimeDifference = timeDifference;
           }
@@ -43,17 +43,27 @@ async function checkMedicineSchedule(req, res) {
 
         if (matchedSchedule) {
           const scheduledTime = matchedSchedule.time;
-          const medicineName = matchedSchedule.medicine;
           const dose = matchedSchedule.dose;
+          const pillName = matchedSchedule.medicine;
 
           // Dummy tank ID for demonstration
-          const tankId = 2;
+          let tankId = -2;
 
+          // Get the correct tank ID 
+          // Query the tank table to get the tank_id for the medicine and box
+          const tankResult = await pool.request()
+            .input('pillName', sql.NVarChar, pillName)
+            .input('boxId', sql.Int, boxId)
+            .query('SELECT * FROM dbo.tank WHERE pillName = @pillName AND box_id = @boxId');
+
+          if (tankResult.recordset.length > 0) {
+            tankId = tankResult.recordset[0].id;
+          }
           // Send the information as a JSON string
           res.json({
             boxId: boxId,
             tankId: tankId,
-            medicineName: medicineName,
+            medicineName: pillName,
             scheduledTime: scheduledTime,
             dose: dose
           });
