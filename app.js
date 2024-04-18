@@ -13,6 +13,7 @@ const updateTakenStatusRoutes = require('./src/models/updateTakenStatus');
 const getPatientRoutes = require('./src/models/getPatient');
 const addPatientRoutes = require('./src/models/addPatient');
 const getMedicinesRoutes = require('./src/models/getMedicines');
+const deleteBoxRoutes = require('./src/models/deleteBox');
 const setTankInfo = require('./src/models/setTankInfo');
 const checkMedicineSchedule = require('./src/models/checkMedicineSchedule');
 const batchDeleteRouter = require('./src/models/batchDelete');
@@ -41,6 +42,7 @@ app.use('/api', getMedicinesRoutes);
 app.use('/api', checkMedicineSchedule);
 app.use('/api', setTankInfo);
 app.use('/api', batchDeleteRouter);
+app.use('/api', deleteBoxRoutes);
 app.use('/api', singleDeleteRouter);
 app.use('/api', updateTakenStatusFromBox);
 

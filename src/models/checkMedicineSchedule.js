@@ -59,7 +59,6 @@ async function checkMedicineSchedule(req, res) {
           if (tankResult.recordset.length > 0) {
             tankId = tankResult.recordset[0].id;
           }
-
           // Send the information as a JSON string
           res.json({
             boxId: boxId,
