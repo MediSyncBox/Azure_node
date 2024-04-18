@@ -12,8 +12,8 @@ async function updateTakenStatusFromBox(req, res) {
     let pool = await sql.connect(dbConfig);
     if (taken == 1) {
         const userBoxResult = await pool.request()
-        .input('boxId', sql.Int, boxId)
-        .query('SELECT user_id FROM dbo.user_box WHERE box_id = @boxId');
+            .input('boxId', sql.Int, boxId)
+            .query('SELECT user_id FROM dbo.user_box WHERE box_id = @boxId');
 
         if (userBoxResult.recordset.length > 0) {
             const userId = userBoxResult.recordset[0].user_id;
@@ -21,16 +21,16 @@ async function updateTakenStatusFromBox(req, res) {
             // Query the schedule table to find the exact entry 
             const scheduleResult = await pool.request()
                 .input('userId', sql.Int, userId)
-                .input('medicineName', sql.VarChar, medicineName)
-                .input('scheduledTime', sql.VarChar, scheduledTime)
+                .input('medicine', sql.NVarChar, medicine)
+                .input('time', sql.SmallDateTime, time)
                 .query('SELECT * FROM dbo.schedule WHERE user_id = @userId AND medicine = @medicine AND time = @time');
 
             if (scheduleResult.recordset.length > 0) {
                 // Matching entry found, update the taken field
                     await pool.request()
                         .input('userId', sql.Int, userId)
-                        .input('medicineName', sql.VarChar, medicineName)
-                        .input('scheduledTime', sql.VarChar, scheduledTime)
+                        .input('medicine', sql.NVarChar, medicine)
+                        .input('time', sql.SmallDateTime, time)
                         .input('taken', sql.Bit, taken)
                         .query('UPDATE dbo.schedule SET taken = @taken WHERE user_id = @userId AND medicine = @medicine AND time = @time');
 
