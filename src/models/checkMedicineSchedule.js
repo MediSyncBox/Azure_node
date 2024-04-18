@@ -2,91 +2,79 @@ const express = require('express');
 const sql = require('mssql');
 const dbConfig = require('../dbConfig');
 const router = express.Router();
-const cron = require('node-cron');
+
 
 async function checkMedicineSchedule(req, res) {
-   const currentTime = new Date().toISOString().slice(0, -1) + '0000000';
+  const { boxId } = req.params;
+  const { currentTime } = req.body;
 
-   try {
-     let pool = await sql.connect(dbConfig);
+  try {
+    let pool = await sql.connect(dbConfig);
 
-    // Query the schedule table to check for matching scheduled times
-    const scheduleResult = await pool.request()
-      .query('SELECT * FROM dbo.schedule WHERE id = 600');
+    // Query the user_box table to get the user_id for the given boxId
+    const userBoxResult = await pool.request()
+      .input('boxId', sql.Int, boxId)
+      .query('SELECT user_id FROM dbo.user_box WHERE box_id = @boxId');
 
-    if (scheduleResult.recordset.length > 0) {
-      // Matching schedules found
-      for (const schedule of scheduleResult.recordset) {
-        const userId = schedule.user_id;
-        const medicineName = schedule.medicine;
-        const scheduledTime = schedule.time;
+    if (userBoxResult.recordset.length > 0) {
+      const userId = userBoxResult.recordset[0].user_id;
 
-        // Query the user_box table to get the box_id for the user
-        const userBoxResult = await pool.request()
-          .input('userId', sql.Int, userId)
-          .query('SELECT box_id FROM dbo.user_box WHERE user_id = @userId');
+      // Query the schedule table for all untaken schedules for the userId
+      const scheduleResult = await pool.request()
+        .input('userId', sql.Int, userId)
+        .query('SELECT * FROM dbo.schedule WHERE user_id = @userId AND taken = 0');
 
-        if (userBoxResult.recordset.length > 0) {
-          const boxId = userBoxResult.recordset[0].box_id;
+      if (scheduleResult.recordset.length > 0) {
+        const currentDateTime = new Date(currentTime);
+
+        // Find the schedule with the minimum time difference within the allowed range
+        let matchedSchedule = null;
+        let minTimeDifference = Infinity;
+
+        for (const schedule of scheduleResult.recordset) {
+          const scheduledDateTime = new Date(schedule.time);
+          const timeDifference = Math.abs(currentDateTime - scheduledDateTime);
+
+          if (timeDifference <= 5000 && timeDifference < minTimeDifference) {
+            matchedSchedule = schedule;
+            minTimeDifference = timeDifference;
+          }
+        }
+
+        if (matchedSchedule) {
+          const scheduledTime = matchedSchedule.time;
+          const medicineName = matchedSchedule.medicine;
+          const dose = matchedSchedule.dose;
 
           // Dummy tank ID for demonstration
           const tankId = 2;
-          //res.json({
-          //  boxId: boxId,
-          //  tankId: tankId,
-          //  medicineName: medicineName,
-          //  scheduledTime: scheduledTime
-          //});
-          // Redirect or construct a URL with boxId
-          const redirectUrl = url.format({
-            pathname: `/api/boxes/${boxId}/reminder`,
-            query: {
-              tankId: tankId,
-              medicineName: medicineName,
-              scheduledTime: scheduledTime
-            }
-          });
-          // Redirect to the URL
-          res.redirect(redirectUrl);
 
+          // Send the information as a JSON string
+          res.json({
+            boxId: boxId,
+            tankId: tankId,
+            medicineName: medicineName,
+            scheduledTime: scheduledTime,
+            dose: dose
+          });
         } else {
-          console.log(`No box found for User ID: ${userId}`);
-          res.status(404).send(`No box found for User ID: ${userId}`);
+          console.log('No matching medicine schedules found within the allowed time difference');
+          res.json({ boxId: boxId, tankId: -1, dose : -1 });
         }
+      } else {
+        console.log(`No untaken medicine schedules found for User ID: ${userId}`);
+        res.json({ boxId: boxId, tankId: -2 , dose : -2});
       }
     } else {
-      console.log('No matching medicine schedules found');
-      res.status(404).send('No matching medicine schedules found');
+      console.log(`No user found for Box ID: ${boxId}`);
+      res.json({ boxId: boxId, tankId: -3, dose : -3 });
     }
   } catch (err) {
     console.error('Database error:', err);
-    res.status(500).send('Database error');
+    res.json({ boxId: boxId, tankId: -4, dose : -4 });
   }
 }
 
-//cron runs every minute
-cron.schedule('* * * * *', async () => {
-  // Mimic a request and response object if necessary
-  let req = {}; // dummy request object
-  let res = { redirect: console.log }; // dummy response object with redirect method
-
-  await checkMedicineSchedule(req, res);
-});
-
-// Example route to display details based on boxId
-router.get('/boxes/:boxId/reminder', (req, res) => {
-  const { boxId } = req.params;
-  const { tankId, medicineName, scheduledTime } = req.query;
-
-  res.json({
-    boxId: boxId,
-    tankId: tankId,
-    medicineName: medicineName,
-    scheduledTime: scheduledTime
-  });
-  //res.send(`Reminder for boxId ${boxId}`);
-});
-
-router.get('/medicine-reminder', checkMedicineSchedule);
+router.post('/medicine-reminder/:boxId', checkMedicineSchedule);
 
 module.exports = router;
