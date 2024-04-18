@@ -6,7 +6,7 @@ const router = express.Router();
 
 async function updateTakenStatusFromBox(req, res) {
   const { boxId } = req.params;
-  const { tankId, medicineName, scheduledTime, taken } = req.body;
+  const { tankId, medicine, time, taken } = req.body;
 
   try {
     let pool = await sql.connect(dbConfig);
@@ -23,16 +23,16 @@ async function updateTakenStatusFromBox(req, res) {
                 .input('userId', sql.Int, userId)
                 .input('medicineName', sql.VarChar, medicineName)
                 .input('scheduledTime', sql.VarChar, scheduledTime)
-                .query('SELECT * FROM dbo.schedule WHERE user_id = @userId AND medicineName = @medicineName AND scheduledTime = @scheduledTime');
+                .query('SELECT * FROM dbo.schedule WHERE user_id = @userId AND medicine = @medicine AND time = @time');
 
             if (scheduleResult.recordset.length > 0) {
                 // Matching entry found, update the taken field
                     await pool.request()
-                        .input('boxId', sql.Int, boxId)
+                        .input('userId', sql.Int, userId)
                         .input('medicineName', sql.VarChar, medicineName)
                         .input('scheduledTime', sql.VarChar, scheduledTime)
                         .input('taken', sql.Bit, taken)
-                        .query('UPDATE dbo.schedule SET taken = 1 WHERE box_id = @boxId AND medicineName = @medicineName AND scheduledTime = @scheduledTime');
+                        .query('UPDATE dbo.schedule SET taken = @taken WHERE user_id = @userId AND medicine = @medicine AND time = @time');
 
                     res.json({ message: 'Medicine marked as taken successfully' });
 
@@ -43,7 +43,7 @@ async function updateTakenStatusFromBox(req, res) {
                         .query('SELECT * FROM [dbo].[tank] WHERE box_id = @box_id AND servo_id = @servo_id');
 
                     if (existingRecord.recordset.length > 0) {
-                        const pillNumber = serBoxResult.recordset[0].pillNumber - 1;
+                        const pillNumber = existingRecord.recordset[0].pillNumber - 1;
                         // Update the existing record
                         await pool.request()
                             .input('box_id', sql.Int, boxId)
